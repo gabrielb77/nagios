@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  nagios:
+    image: nagios:1.7
+    deploy:
+      replicas: 1
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - nagios-etc:/nagios/etc
+      - nagios-var:/nagios/var
+      - nagios-libexec:/nagios/libexec
+
+volumes:
+  nagios-etc:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.96.154.51,nolock,soft,rw"
+      device: ":/nfsshare/vol/nagios/etc"
+  nagios-var:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.96.154.51,nolock,soft,rw"
+      device: ":/nfsshare/vol/nagios/var"
+  nagios-libexec:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.96.154.51,nolock,soft,rw"
+      device: ":/nfsshare/vol/nagios/libexec"
+
+

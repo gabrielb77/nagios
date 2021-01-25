@@ -1,0 +1,28 @@
+FROM debian:latest
+
+ENV http_proxy="http://193.56.47.20:8080"
+ENV https_proxy="http://193.56.47.20:8080"
+EXPOSE 80
+EXPOSE 443
+COPY entrypoint.sh /
+
+RUN apt-get update && apt-get -y upgrade && apt-get -y install apt-utils gcc make unzip procps libpng-dev libjpeg-dev libgd-dev apache2 php snmp libnet-snmp-perl libssl-dev wget bc gawk dc gettext libdbi-dev libldap2-dev libmariadbclient-dev libmariadbclient-dev-compat dnsutils fping libpqxx-dev ssh libradsec-dev sudo
+
+WORKDIR /build
+
+COPY nagios-4.4.6.tar.gz nagios.tar.gz
+COPY nagios-plugins-2.3.3.tar.gz nagios-plugins.tar.gz
+RUN mkdir nagios && tar xf nagios.tar.gz -C nagios --strip-components=1 && mkdir nagios-plugins && tar xf nagios-plugins.tar.gz -C nagios-plugins --strip-components=1
+WORKDIR /build/nagios
+
+RUN ./configure --prefix=/nagios && make all && make install-groups-users && usermod -a -G nagios www-data && make install && make install-webconf && make install-commandmode && make install-config && mkdir -p /nagios/etc/
+COPY htpasswd.users /nagios/etc/
+
+WORKDIR /build/nagios-plugins
+RUN ./configure --prefix=/nagios && make && make install && a2enmod ssl && a2enmod cgi && a2ensite default-ssl
+
+
+CMD ["/bin/bash"]
+
+ENTRYPOINT ["/entrypoint.sh"]
+

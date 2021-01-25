@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  nagios:
+    image: localregistry:5000/nagios:1.9
+    deploy:
+      replicas: 1
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - nagios-etc:/nagios/etc
+      - nagios-var:/nagios/var
+      - nagios-ext-plugins:/nagios/ext-plugins
+
+volumes:
+  nagios-etc:
+    driver_opts:
+      type: "nfs"
+      o: "addr=172.30.0.20,nolock,soft,rw"
+      device: ":/ibm/cluster_docker/nagios/etc"
+  nagios-var:
+    driver_opts:
+      type: "nfs"
+      o: "addr=172.30.0.20,nolock,soft,rw"
+      device: ":/ibm/cluster_docker/nagios/var"
+  nagios-ext-plugins:
+    driver_opts:
+      type: "nfs"
+      o: "addr=172.30.0.20,nolock,soft,rw"
+      device: ":/ibm/cluster_docker/nagios/ext-plugins"
+
+
