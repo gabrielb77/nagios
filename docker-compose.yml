@@ -1,5 +1,6 @@
 version: '3.8'
 
+
 services:
   nagios:
     image: localregistry:5000/nagios:1.9
